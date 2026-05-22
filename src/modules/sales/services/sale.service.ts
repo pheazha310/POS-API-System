@@ -1,0 +1,2 @@
+// Sale service placeholder.
+export {};

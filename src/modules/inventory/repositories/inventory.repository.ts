@@ -1,0 +1,2 @@
+// Inventory repository placeholder.
+export {};

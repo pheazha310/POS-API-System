@@ -1,0 +1,2 @@
+// Product controller placeholder.
+export {};

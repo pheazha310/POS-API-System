@@ -1,0 +1,2 @@
+// Report controller placeholder.
+export {};

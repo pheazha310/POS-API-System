@@ -1,0 +1,2 @@
+// Inventory service placeholder.
+export {};

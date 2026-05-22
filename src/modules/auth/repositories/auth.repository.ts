@@ -1,0 +1,2 @@
+// Auth repository placeholder.
+export {};

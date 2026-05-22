@@ -1,0 +1,2 @@
+// Inventory routes placeholder.
+export {};

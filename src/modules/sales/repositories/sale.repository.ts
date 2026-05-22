@@ -1,0 +1,2 @@
+// Sale repository placeholder.
+export {};

@@ -1,0 +1,2 @@
+// Product routes placeholder.
+export {};

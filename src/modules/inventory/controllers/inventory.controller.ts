@@ -1,0 +1,2 @@
+// Inventory controller placeholder.
+export {};
