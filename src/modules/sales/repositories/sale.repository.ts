@@ -63,6 +63,11 @@ export class SaleRepository {
   public findById(id: string): Sale | undefined {
     return sales.find((sale) => sale.id === id);
   }
+
+  public create(payload: Sale): Sale {
+    sales.push(payload);
+    return payload;
+  }
 }
 
 export const saleRepository = new SaleRepository();

@@ -6,6 +6,7 @@ import { MESSAGES } from './constants/messages';
 import { errorHandler } from './core/middlewares/error-handler';
 import { notFoundHandler } from './core/middlewares/not-found';
 import { checkoutRouter } from './modules/checkout/routes/checkout.routes';
+import { reportRouter } from './modules/reports/routes/report.routes';
 import { saleRouter } from './modules/sales/routes/sale.routes';
 
 const app = express();
@@ -20,6 +21,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use(`${env.apiPrefix}/checkout`, checkoutRouter);
+app.use(`${env.apiPrefix}/reports`, reportRouter);
 app.use(`${env.apiPrefix}/sales`, saleRouter);
 
 app.use(notFoundHandler);

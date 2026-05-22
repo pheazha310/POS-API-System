@@ -7,4 +7,9 @@ export const MESSAGES = {
   SALE_FETCH_SUCCESS: 'Sale fetched successfully.',
   SALE_ID_REQUIRED: 'Sale id is required.',
   SALE_NOT_FOUND: 'Sale not found.',
+  DAILY_REPORT_FETCH_SUCCESS: 'Daily report fetched successfully.',
+  MONTHLY_REPORT_FETCH_SUCCESS: 'Monthly report fetched successfully.',
+  INVALID_REPORT_DATE: 'Report date must be in YYYY-MM-DD format.',
+  INVALID_REPORT_MONTH: 'Report month must be a number from 1 to 12.',
+  INVALID_REPORT_YEAR: 'Report year must be a valid 4-digit number.',
 } as const;

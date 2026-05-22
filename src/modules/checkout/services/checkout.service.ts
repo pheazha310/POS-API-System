@@ -1,6 +1,7 @@
 import { HTTP_STATUS } from '../../../constants/http-status';
 import { MESSAGES } from '../../../constants/messages';
 import { AppError } from '../../../core/errors/app-error';
+import { saleRepository } from '../../sales/repositories/sale.repository';
 import type {
   CheckoutItemInput,
   CheckoutRequest,
@@ -72,9 +73,34 @@ export class CheckoutService {
     const discountedSubtotal = Math.max(0, subtotal - discount);
     const taxAmount = Number(((discountedSubtotal * taxRate) / 100).toFixed(2));
     const total = Number((discountedSubtotal + taxAmount).toFixed(2));
+    const checkoutId = `chk_${Date.now()}`;
+
+    saleRepository.create({
+      id: checkoutId.replace('chk_', 'sale_'),
+      customer: payload.customer?.name?.trim()
+        ? {
+            name: payload.customer.name.trim(),
+            phone: payload.customer.phone?.trim() || undefined,
+          }
+        : undefined,
+      discount: Number(discount.toFixed(2)),
+      items: items.map((item, index) => ({
+        productId: item.productId ?? `item_${index + 1}`,
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        lineTotal: item.lineTotal,
+      })),
+      paymentMethod,
+      soldAt: new Date().toISOString(),
+      subtotal,
+      taxAmount,
+      taxRate: Number(taxRate.toFixed(2)),
+      total,
+    });
 
     return {
-      checkoutId: `chk_${Date.now()}`,
+      checkoutId,
       customer: payload.customer,
       discount: Number(discount.toFixed(2)),
       items,
