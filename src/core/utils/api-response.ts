@@ -1,2 +1,11 @@
-// API response formatter placeholder.
-export {};
+export type ApiSuccessResponse<T> = {
+  success: true;
+  message: string;
+  data: T;
+};
+
+export const apiResponse = <T>(message: string, data: T): ApiSuccessResponse<T> => ({
+  success: true,
+  message,
+  data,
+});
