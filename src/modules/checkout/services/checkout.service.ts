@@ -28,17 +28,20 @@ const validateItem = (item: CheckoutItemInput, index: number): void => {
 };
 
 export class CheckoutService {
-  public createCheckout(payload: CheckoutRequest): CheckoutResult {
-    if (!Array.isArray(payload.items) || payload.items.length === 0) {
+  public createCheckout(payload: Partial<CheckoutRequest> | undefined): CheckoutResult {
+    const checkoutPayload = payload ?? {};
+    const checkoutItems = Array.isArray(checkoutPayload.items) ? checkoutPayload.items : [];
+
+    if (checkoutItems.length === 0) {
       throw new AppError(
         `${MESSAGES.INVALID_CHECKOUT_PAYLOAD} At least one item is required.`,
         HTTP_STATUS.BAD_REQUEST,
       );
     }
 
-    const discount = payload.discount ?? 0;
-    const taxRate = payload.taxRate ?? 0;
-    const paymentMethod = payload.paymentMethod ?? 'cash';
+    const discount = checkoutPayload.discount ?? 0;
+    const taxRate = checkoutPayload.taxRate ?? 0;
+    const paymentMethod = checkoutPayload.paymentMethod ?? 'cash';
 
     if (!Number.isFinite(discount) || discount < 0) {
       throw new AppError(
@@ -61,9 +64,9 @@ export class CheckoutService {
       );
     }
 
-    payload.items.forEach(validateItem);
+    checkoutItems.forEach(validateItem);
 
-    const items = payload.items.map((item) => ({
+    const items = checkoutItems.map((item) => ({
       ...item,
       name: item.name.trim(),
       lineTotal: Number((item.quantity * item.unitPrice).toFixed(2)),
@@ -77,10 +80,10 @@ export class CheckoutService {
 
     saleRepository.create({
       id: checkoutId.replace('chk_', 'sale_'),
-      customer: payload.customer?.name?.trim()
+      customer: checkoutPayload.customer?.name?.trim()
         ? {
-            name: payload.customer.name.trim(),
-            phone: payload.customer.phone?.trim() || undefined,
+            name: checkoutPayload.customer.name.trim(),
+            phone: checkoutPayload.customer.phone?.trim() || undefined,
           }
         : undefined,
       discount: Number(discount.toFixed(2)),
@@ -101,7 +104,7 @@ export class CheckoutService {
 
     return {
       checkoutId,
-      customer: payload.customer,
+      customer: checkoutPayload.customer,
       discount: Number(discount.toFixed(2)),
       items,
       paymentMethod,

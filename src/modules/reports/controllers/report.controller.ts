@@ -6,19 +6,19 @@ import { apiResponse } from '../../../core/utils/api-response';
 import { reportService } from '../services/report.service';
 
 export class ReportController {
-  public getDailyReport(req: Request, res: Response): void {
+  public async getDailyReport(req: Request, res: Response): Promise<void> {
     const date = typeof req.query.date === 'string' ? req.query.date : undefined;
-    const result = reportService.getDailyReport(date);
+    const result = await reportService.getDailyReport(date);
 
     res
       .status(HTTP_STATUS.OK)
       .json(apiResponse(MESSAGES.DAILY_REPORT_FETCH_SUCCESS, result));
   }
 
-  public getMonthlyReport(req: Request, res: Response): void {
+  public async getMonthlyReport(req: Request, res: Response): Promise<void> {
     const month = typeof req.query.month === 'string' ? req.query.month : undefined;
     const year = typeof req.query.year === 'string' ? req.query.year : undefined;
-    const result = reportService.getMonthlyReport(month, year);
+    const result = await reportService.getMonthlyReport(month, year);
 
     res
       .status(HTTP_STATUS.OK)

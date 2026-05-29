@@ -5,18 +5,18 @@ import type { Sale } from '../models/sale.model';
 import { saleRepository } from '../repositories/sale.repository';
 
 export class SaleService {
-  public getSales(): Sale[] {
+  public async getSales(): Promise<Sale[]> {
     return saleRepository.findAll();
   }
 
-  public getSaleById(id: string): Sale {
+  public async getSaleById(id: string): Promise<Sale> {
     const saleId = id.trim();
 
     if (!saleId) {
       throw new AppError(MESSAGES.SALE_ID_REQUIRED, HTTP_STATUS.BAD_REQUEST);
     }
 
-    const sale = saleRepository.findById(saleId);
+    const sale = await saleRepository.findById(saleId);
 
     if (!sale) {
       throw new AppError(MESSAGES.SALE_NOT_FOUND, HTTP_STATUS.NOT_FOUND);

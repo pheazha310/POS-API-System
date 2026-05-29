@@ -6,17 +6,17 @@ import { apiResponse } from '../../../core/utils/api-response';
 import { saleService } from '../services/sale.service';
 
 export class SaleController {
-  public getSales(_req: Request, res: Response): void {
-    const result = saleService.getSales();
+  public async getSales(_req: Request, res: Response): Promise<void> {
+    const result = await saleService.getSales();
 
     res
       .status(HTTP_STATUS.OK)
       .json(apiResponse(MESSAGES.SALES_FETCH_SUCCESS, result));
   }
 
-  public getSaleById(req: Request, res: Response): void {
+  public async getSaleById(req: Request, res: Response): Promise<void> {
     const saleId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const result = saleService.getSaleById(saleId ?? '');
+    const result = await saleService.getSaleById(saleId ?? '');
 
     res
       .status(HTTP_STATUS.OK)

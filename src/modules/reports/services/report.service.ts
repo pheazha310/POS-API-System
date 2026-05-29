@@ -51,9 +51,9 @@ const sortSalesByDate = (sales: Sale[]): Sale[] => {
 };
 
 export class ReportService {
-  public getDailyReport(date?: string): DailyReport {
+  public async getDailyReport(date?: string): Promise<DailyReport> {
     const targetDate = this.resolveDailyDate(date);
-    const sales = sortSalesByDate(reportRepository.findAllSales()).filter((sale) => toUtcDateKey(sale.soldAt) === targetDate);
+    const sales = sortSalesByDate(await reportRepository.findAllSales()).filter((sale) => toUtcDateKey(sale.soldAt) === targetDate);
 
     return {
       date: targetDate,
@@ -62,10 +62,10 @@ export class ReportService {
     };
   }
 
-  public getMonthlyReport(month?: string, year?: string): MonthlyReport {
+  public async getMonthlyReport(month?: string, year?: string): Promise<MonthlyReport> {
     const { targetMonth, targetYear } = this.resolveMonthYear(month, year);
     const monthKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
-    const sales = sortSalesByDate(reportRepository.findAllSales()).filter((sale) => toUtcMonthKey(sale.soldAt) === monthKey);
+    const sales = sortSalesByDate(await reportRepository.findAllSales()).filter((sale) => toUtcMonthKey(sale.soldAt) === monthKey);
     const groupedByDay = new Map<string, Sale[]>();
 
     sales.forEach((sale) => {

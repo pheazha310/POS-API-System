@@ -5,9 +5,14 @@ import { HTTP_STATUS } from './constants/http-status';
 import { MESSAGES } from './constants/messages';
 import { errorHandler } from './core/middlewares/error-handler';
 import { notFoundHandler } from './core/middlewares/not-found';
+import { authRouter } from './modules/auth/routes/auth.routes';
+import { cartRouter } from './modules/cart/routes/cart.routes';
 import { checkoutRouter } from './modules/checkout/routes/checkout.routes';
+import { inventoryRouter } from './modules/inventory/routes/inventory.routes';
+import { productRouter } from './modules/products/routes/product.routes';
 import { reportRouter } from './modules/reports/routes/report.routes';
 import { saleRouter } from './modules/sales/routes/sale.routes';
+import { userRouter } from './modules/users/routes/user.routes';
 
 const app = express();
 
@@ -333,6 +338,11 @@ app.get('/health', (_req, res) => {
 });
 
 app.use(`${env.apiPrefix}/checkout`, checkoutRouter);
+app.use(`${env.apiPrefix}/auth`, authRouter);
+app.use(`${env.apiPrefix}/users`, userRouter);
+app.use(`${env.apiPrefix}/products`, productRouter);
+app.use(`${env.apiPrefix}/cart`, cartRouter);
+app.use(`${env.apiPrefix}/inventory`, inventoryRouter);
 app.use(`${env.apiPrefix}/reports`, reportRouter);
 app.use(`${env.apiPrefix}/sales`, saleRouter);
 
