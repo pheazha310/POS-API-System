@@ -6,8 +6,8 @@ import { apiResponse } from '../../../core/utils/api-response';
 import { checkoutService } from '../services/checkout.service';
 
 export class CheckoutController {
-  public createCheckout(req: Request, res: Response): void {
-    const result = checkoutService.createCheckout(req.body);
+  public async createCheckout(req: Request, res: Response): Promise<void> {
+    const result = await checkoutService.createCheckout(req.body);
 
     res
       .status(HTTP_STATUS.CREATED)

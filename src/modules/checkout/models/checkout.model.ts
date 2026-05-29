@@ -13,6 +13,7 @@ export type CheckoutRequest = {
     phone?: string;
   };
   discount?: number;
+  userId?: number;
   items: CheckoutItemInput[];
   paymentMethod?: PaymentMethod;
   taxRate?: number;
