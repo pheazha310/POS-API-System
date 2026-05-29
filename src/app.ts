@@ -8,7 +8,7 @@ export const app = express();
 
 app.use(express.json());
 
-app.get("/health", (_req, res) => {
+app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "POS API is running",

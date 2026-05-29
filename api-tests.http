@@ -1,0 +1,84 @@
+@baseUrl = http://localhost:5000
+@apiPrefix = /api/v1
+@productId = replace-after-create
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Root Page
+GET {{baseUrl}}/
+
+### Create Product
+POST {{baseUrl}}{{apiPrefix}}/products
+Content-Type: application/json
+
+{
+  "name": "Coca Cola",
+  "price": 1.5,
+  "stock": 24,
+  "barcode": "8851959130177",
+  "category": "beverage"
+}
+
+### Get All Products
+GET {{baseUrl}}{{apiPrefix}}/products
+
+### Search Product
+GET {{baseUrl}}{{apiPrefix}}/products?search=coca
+
+### Filter By Category
+GET {{baseUrl}}{{apiPrefix}}/products?category=beverage
+
+### Get Single Product
+GET {{baseUrl}}{{apiPrefix}}/products/{{productId}}
+
+### Update Product
+PUT {{baseUrl}}{{apiPrefix}}/products/{{productId}}
+Content-Type: application/json
+
+{
+  "name": "Coca Cola Zero",
+  "price": 1.75,
+  "stock": 30,
+  "barcode": "8851959130177",
+  "category": "beverage"
+}
+
+### Soft Delete Product
+DELETE {{baseUrl}}{{apiPrefix}}/products/{{productId}}
+
+### Validation Test: Price Must Be Greater Than Zero
+POST {{baseUrl}}{{apiPrefix}}/products
+Content-Type: application/json
+
+{
+  "name": "Invalid Product",
+  "price": 0,
+  "stock": 10,
+  "barcode": "invalid-price-001",
+  "category": "beverage"
+}
+
+### Validation Test: Stock Cannot Be Negative
+POST {{baseUrl}}{{apiPrefix}}/products
+Content-Type: application/json
+
+{
+  "name": "Negative Stock Product",
+  "price": 2.5,
+  "stock": -1,
+  "barcode": "negative-stock-001",
+  "category": "beverage"
+}
+
+### Validation Test: Duplicate Barcode
+POST {{baseUrl}}{{apiPrefix}}/products
+Content-Type: application/json
+
+{
+  "name": "Duplicate Barcode Product",
+  "price": 2.5,
+  "stock": 5,
+  "barcode": "8851959130177",
+  "category": "beverage"
+}
