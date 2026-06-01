@@ -1,9 +1,11 @@
+export type UserRole = "ADMIN" | "CASHIER" | "MANAGER";
+
 export interface IUser {
   id?: number;
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: UserRole;
 }
 
 export interface IUserPayload {

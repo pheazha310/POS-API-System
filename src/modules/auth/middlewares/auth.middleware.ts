@@ -3,8 +3,9 @@ import { NextFunction, Request, Response } from "express";
 import { IAuthTokenPayload } from "../models/auth.model";
 import authService from "../services/auth.service";
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user?: IAuthTokenPayload;
+  token?: string;
 }
 
 class AuthMiddleware {
@@ -25,7 +26,8 @@ class AuthMiddleware {
       const token = authHeader.split(" ")[1];
       const user = authService.verifyAccessToken(token);
 
-      req.user = user;
+      req.user  = user;
+      req.token = token;
       next();
     } catch (error: any) {
       return res.status(401).json({
