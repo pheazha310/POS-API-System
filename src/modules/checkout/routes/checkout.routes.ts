@@ -6,7 +6,7 @@ import { checkoutController } from '../controllers/checkout.controller';
 const checkoutRouter = Router();
 
 checkoutRouter.post('/', asyncHandler(async (req, res) => {
-  checkoutController.createCheckout(req, res);
+  await checkoutController.createCheckout(req, res);
 }));
 
 export { checkoutRouter };

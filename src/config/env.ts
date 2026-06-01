@@ -13,6 +13,16 @@ const parsePort = (value: string | undefined): number => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallbackPort;
 };
 
+const parsePositiveInteger = (value: string | undefined, fallback: number): number => {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
 const getRequiredEnv = (key: string): string => {
   const value = process.env[key];
 
@@ -23,14 +33,21 @@ const getRequiredEnv = (key: string): string => {
   return value;
 };
 
+const getOptionalEnv = (key: string, fallback = ''): string => {
+  const value = process.env[key];
+
+  return value ?? fallback;
+};
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parsePort(process.env.PORT),
   apiPrefix: process.env.API_PREFIX ?? '/api/v1',
   dbHost: getRequiredEnv('DB_HOST'),
   dbPort: parsePort(process.env.DB_PORT),
+  dbConnectionLimit: parsePositiveInteger(process.env.DB_CONNECTION_LIMIT, 25),
   dbName: getRequiredEnv('DB_NAME'),
   dbUser: getRequiredEnv('DB_USER'),
-  dbPassword: getRequiredEnv('DB_PASSWORD'),
+  dbPassword: getOptionalEnv('DB_PASSWORD'),
   databaseUrl: process.env.DATABASE_URL,
 } as const;

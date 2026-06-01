@@ -1,4 +1,6 @@
 import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
 
 import { env } from './config/env';
 import { HTTP_STATUS } from './constants/http-status';
@@ -16,6 +18,8 @@ import { userRouter } from './modules/users/routes/user.routes';
 
 const app = express();
 
+app.use(helmet());
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (_req, res) => {
@@ -278,6 +282,38 @@ app.get('/', (_req, res) => {
                 <h3>Checkout</h3>
                 <a class="endpoint-link" href="${env.apiPrefix}/checkout">${env.apiPrefix}/checkout</a>
                 <p>Create a checkout transaction from cart items.</p>
+              </div>
+            </article>
+            <article class="endpoint">
+              <div class="endpoint-method">POST</div>
+              <div class="endpoint-copy">
+                <h3>Add Cart Item</h3>
+                <a class="endpoint-link" href="${env.apiPrefix}/cart/add">${env.apiPrefix}/cart/add</a>
+                <p>Add a product, quantity, and unit price to the cart.</p>
+              </div>
+            </article>
+            <article class="endpoint">
+              <div class="endpoint-method">GET</div>
+              <div class="endpoint-copy">
+                <h3>Cart</h3>
+                <a class="endpoint-link" href="${env.apiPrefix}/cart">${env.apiPrefix}/cart</a>
+                <p>Inspect the current cart contents and totals.</p>
+              </div>
+            </article>
+            <article class="endpoint">
+              <div class="endpoint-method">DELETE</div>
+              <div class="endpoint-copy">
+                <h3>Remove Cart Item</h3>
+                <a class="endpoint-link" href="${env.apiPrefix}/cart/item/:id">${env.apiPrefix}/cart/item/:id</a>
+                <p>Remove one item from the cart by its item id.</p>
+              </div>
+            </article>
+            <article class="endpoint">
+              <div class="endpoint-method">POST</div>
+              <div class="endpoint-copy">
+                <h3>Clear Cart</h3>
+                <a class="endpoint-link" href="${env.apiPrefix}/cart/clear">${env.apiPrefix}/cart/clear</a>
+                <p>Remove every item from the current cart.</p>
               </div>
             </article>
             <article class="endpoint">

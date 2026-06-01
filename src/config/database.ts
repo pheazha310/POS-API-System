@@ -19,7 +19,7 @@ const createPool = (): Pool =>
     password: env.dbPassword,
     database: env.dbName,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: env.dbConnectionLimit,
     queueLimit: 0,
     decimalNumbers: true,
   });
