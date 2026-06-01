@@ -8,8 +8,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+app.get("/", (_req, res) => {
+  res.json({ status: "server is running" });
 });
 
 app.use((_req, res) => {
