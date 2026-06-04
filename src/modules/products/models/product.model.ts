@@ -11,6 +11,7 @@ export interface Product {
   name: string;
   price: number;
   stock: number;
+  unit: string;
   barcode: string;
   category: string;
   createdAt: string;
@@ -22,6 +23,7 @@ export interface CreateProductInput {
   name: string;
   price: number;
   stock: number;
+  unit: string;
   barcode: string;
   category: string;
 }
@@ -30,6 +32,7 @@ export interface UpdateProductInput {
   name?: string;
   price?: number;
   stock?: number;
+  unit?: string;
   barcode?: string;
   category?: string;
   deletedAt?: string | null;

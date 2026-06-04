@@ -11,6 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Node16"
   },
-  "include": ["src"],
+  "include": ["src", "test/product-concurrency.test.ts"],
   "exclude": ["node_modules", "dist"]
 }

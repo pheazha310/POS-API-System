@@ -13,6 +13,33 @@ export const productRouter = Router();
 
 productRouter.post("/", asyncHandler(productController.createProduct));
 productRouter.get("/", asyncHandler(productController.getProducts));
+
+// Static routes must be declared before dynamic :id routes so they match correctly.
+productRouter.get(
+  "/barcodes/:barcode",
+  asyncHandler(productController.getProductByBarcode),
+);
+productRouter.get(
+  "/categories",
+  asyncHandler(productController.getProductCategories),
+);
+productRouter.get(
+  "/low-stock",
+  asyncHandler(productController.getLowStockProducts),
+);
+
 productRouter.get("/:id", asyncHandler(productController.getProductById));
 productRouter.put("/:id", asyncHandler(productController.updateProduct));
-productRouter.delete("/:id", asyncHandler(productController.deleteProduct));
+productRouter.delete("/:barcode", asyncHandler(productController.deleteProduct));
+productRouter.post(
+  "/:id/stock/increase",
+  asyncHandler(productController.increaseStock),
+);
+productRouter.post(
+  "/:id/stock/decrease",
+  asyncHandler(productController.decreaseStock),
+);
+productRouter.post(
+  "/:id/restore",
+  asyncHandler(productController.restoreProduct),
+);
