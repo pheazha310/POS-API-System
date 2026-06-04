@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -19,7 +19,6 @@ const parsePositiveInteger = (value: string | undefined, fallback: number): numb
   }
 
   const parsed = Number(value);
-
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
@@ -33,21 +32,23 @@ const getRequiredEnv = (key: string): string => {
   return value;
 };
 
-const getOptionalEnv = (key: string, fallback = ''): string => {
+const getOptionalEnv = (key: string, fallback = ""): string => {
   const value = process.env[key];
 
   return value ?? fallback;
 };
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV ?? 'development',
+  nodeEnv: process.env.NODE_ENV ?? "development",
   port: parsePort(process.env.PORT),
-  apiPrefix: process.env.API_PREFIX ?? '/api/v1',
-  dbHost: getRequiredEnv('DB_HOST'),
+  apiPrefix: process.env.API_PREFIX ?? "/api/v1",
+  dbHost: getRequiredEnv("DB_HOST"),
   dbPort: parsePort(process.env.DB_PORT),
   dbConnectionLimit: parsePositiveInteger(process.env.DB_CONNECTION_LIMIT, 25),
-  dbName: getRequiredEnv('DB_NAME'),
-  dbUser: getRequiredEnv('DB_USER'),
-  dbPassword: getOptionalEnv('DB_PASSWORD'),
+  dbName: getRequiredEnv("DB_NAME"),
+  dbUser: getRequiredEnv("DB_USER"),
+  dbPassword: getOptionalEnv("DB_PASSWORD"),
   databaseUrl: process.env.DATABASE_URL,
+  jwtAccessSecret: getOptionalEnv("JWT_ACCESS_SECRET", "fallback_secret"),
+  jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? "15m",
 } as const;

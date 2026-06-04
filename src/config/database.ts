@@ -5,9 +5,9 @@ import mysql, {
   type QueryResult,
   type ResultSetHeader,
   type RowDataPacket,
-} from 'mysql2/promise';
+} from "mysql2/promise";
 
-import { env } from './env';
+import { env } from "./env";
 
 let pool: Pool | null = null;
 
@@ -53,9 +53,13 @@ export const closeDatabase = async (): Promise<void> => {
 
 export const getConnection = async (): Promise<PoolConnection> => getPool().getConnection();
 
-export const query = async <T extends RowDataPacket[] | RowDataPacket[][] | ResultSetHeader>(
+export const query = async <
+  T extends RowDataPacket[] | RowDataPacket[][] | ResultSetHeader,
+>(
   sql: string,
   params: unknown[] = [],
 ): Promise<[T, FieldPacket[]]> => {
   return getPool().query<T & QueryResult>(sql, params);
 };
+
+export default getPool();

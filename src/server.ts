@@ -1,19 +1,25 @@
-import { app } from './app';
-import { connectDatabase } from './config/database';
-import { env } from './config/env';
+import app from "./app";
+import { env } from "./config/env";
 
-const startServer = async (): Promise<void> => {
-  try {
-    await connectDatabase();
+const startServer = (port: number): void => {
+  const server = app.listen(port);
 
-    app.listen(env.port, () => {
-      console.log(`POS API listening on http://localhost:${env.port}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server because the database connection could not be established.');
-    console.error(error);
-    process.exit(1);
-  }
+  server.on("listening", () => {
+    const address = server.address();
+    const boundPort = typeof address === "object" && address ? address.port : port;
+
+    console.log(`Server running on http://localhost:${boundPort}`);
+  });
+
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE") {
+      console.warn(`Port ${port} is already in use, trying ${port + 1}...`);
+      startServer(port + 1);
+      return;
+    }
+
+    throw error;
+  });
 };
 
-void startServer();
+startServer(env.port);

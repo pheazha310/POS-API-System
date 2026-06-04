@@ -1,12 +1,13 @@
-import { Router } from 'express';
+import express from "express";
 
-import { HTTP_STATUS } from '../../../constants/http-status';
-import { apiResponse } from '../../../core/utils/api-response';
+import authController from "../controllers/auth.controller";
+import authMiddleware from "../middlewares/auth.middleware";
 
-const authRouter = Router();
+const router = express.Router();
 
-authRouter.get('/', (_req, res) => {
-  res.status(HTTP_STATUS.OK).json(apiResponse('Auth endpoint is available.', { routes: ['GET /auth'] }));
-});
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.post("/logout", authMiddleware.authenticate, authController.logout);
+router.get("/me", authMiddleware.authenticate, authController.me);
 
-export { authRouter };
+export default router;
