@@ -15,6 +15,7 @@ import { userRouter } from "./modules/users/routes/user.routes";
 
 const app = express();
 const cors = require("cors");
+const apiPrefixes = Array.from(new Set([env.apiPrefix, "/api"]));
 
 app.use(helmet());
 app.use(cors());
@@ -25,14 +26,16 @@ app.get("/", (_req, res) => {
   res.json({ status: "server is running" });
 });
 
-app.use(`${env.apiPrefix}/auth`, authRoutes);
-app.use(`${env.apiPrefix}/checkout`, checkoutRouter);
-app.use(`${env.apiPrefix}/users`, userRouter);
-app.use(`${env.apiPrefix}/products`, productRouter);
-app.use(`${env.apiPrefix}/cart`, cartRouter);
-app.use(`${env.apiPrefix}/inventory`, inventoryRouter);
-app.use(`${env.apiPrefix}/reports`, reportRouter);
-app.use(`${env.apiPrefix}/sales`, saleRouter);
+for (const apiPrefix of apiPrefixes) {
+  app.use(`${apiPrefix}/auth`, authRoutes);
+  app.use(`${apiPrefix}/checkout`, checkoutRouter);
+  app.use(`${apiPrefix}/users`, userRouter);
+  app.use(`${apiPrefix}/products`, productRouter);
+  app.use(`${apiPrefix}/cart`, cartRouter);
+  app.use(`${apiPrefix}/inventory`, inventoryRouter);
+  app.use(`${apiPrefix}/reports`, reportRouter);
+  app.use(`${apiPrefix}/sales`, saleRouter);
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);

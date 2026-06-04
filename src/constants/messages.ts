@@ -2,8 +2,11 @@ export const MESSAGES = {
   APP_RUNNING: 'POS API is running.',
   APP_WELCOME: 'Welcome to the POS API System.',
   ROUTE_NOT_FOUND: 'Route not found.',
+  INTERNAL_SERVER_ERROR: 'Internal server error.',
+
   INVALID_CHECKOUT_PAYLOAD: 'Invalid checkout payload.',
   CHECKOUT_SUCCESS: 'Checkout completed successfully.',
+
   INVALID_CART_PAYLOAD: 'Invalid cart payload.',
   CART_FETCH_SUCCESS: 'Cart fetched successfully.',
   CART_ADD_SUCCESS: 'Item added to cart successfully.',
@@ -11,13 +14,22 @@ export const MESSAGES = {
   CART_CLEAR_SUCCESS: 'Cart cleared successfully.',
   CART_ITEM_ID_REQUIRED: 'Cart item id is required.',
   CART_ITEM_NOT_FOUND: 'Cart item not found.',
+
   SALES_FETCH_SUCCESS: 'Sales fetched successfully.',
   SALE_FETCH_SUCCESS: 'Sale fetched successfully.',
   SALE_ID_REQUIRED: 'Sale id is required.',
   SALE_NOT_FOUND: 'Sale not found.',
+
   DAILY_REPORT_FETCH_SUCCESS: 'Daily report fetched successfully.',
   MONTHLY_REPORT_FETCH_SUCCESS: 'Monthly report fetched successfully.',
   INVALID_REPORT_DATE: 'Report date must be in YYYY-MM-DD format.',
   INVALID_REPORT_MONTH: 'Report month must be a number from 1 to 12.',
   INVALID_REPORT_YEAR: 'Report year must be a valid 4-digit number.',
+
+  PRODUCT_CREATED: "Product created successfully",
+  PRODUCT_FETCHED: "Product retrieved successfully",
+  PRODUCTS_FETCHED: "Products retrieved successfully",
+  PRODUCT_UPDATED: "Product updated successfully",
+  PRODUCT_DELETED: "Product deleted successfully",
+  VALIDATION_ERROR: "Validation error",
 } as const;

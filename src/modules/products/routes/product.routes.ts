@@ -1,12 +1,18 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { HTTP_STATUS } from '../../../constants/http-status';
-import { apiResponse } from '../../../core/utils/api-response';
+import { asyncHandler } from "../../../core/utils/async-handler";
+import { ProductController } from "../controllers/product.controller";
+import { ProductRepository } from "../repositories/product.repository";
+import { ProductService } from "../services/product.service";
 
-const productRouter = Router();
+const productRepository = new ProductRepository();
+const productService = new ProductService(productRepository);
+const productController = new ProductController(productService);
 
-productRouter.get('/', (_req, res) => {
-  res.status(HTTP_STATUS.OK).json(apiResponse('Products endpoint is available.', []));
-});
+export const productRouter = Router();
 
-export { productRouter };
+productRouter.post("/", asyncHandler(productController.createProduct));
+productRouter.get("/", asyncHandler(productController.getProducts));
+productRouter.get("/:id", asyncHandler(productController.getProductById));
+productRouter.put("/:id", asyncHandler(productController.updateProduct));
+productRouter.delete("/:id", asyncHandler(productController.deleteProduct));

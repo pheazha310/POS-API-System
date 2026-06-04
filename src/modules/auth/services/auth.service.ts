@@ -13,6 +13,23 @@ import authRepository from "../repositories/auth.repository";
 const tokenBlacklist = new Set<string>();
 const VALID_ROLES: UserRole[] = ["ADMIN", "CASHIER", "MANAGER"];
 
+type BulkRegisterSuccessResult = {
+  index: number;
+  email: string;
+  success: true;
+  message: string;
+  userId: number;
+};
+
+type BulkRegisterFailureResult = {
+  index: number;
+  email: string;
+  success: false;
+  error: string;
+};
+
+type BulkRegisterResult = BulkRegisterSuccessResult | BulkRegisterFailureResult;
+
 class AuthService {
   private sanitizeUser(user: IUser & { id: number }): IUserPayload {
     return {
@@ -62,6 +79,45 @@ class AuthService {
     });
 
     return { message: "Register successful", userId: insertId };
+  }
+
+  async registerBulk(data: Array<Partial<IUser>>) {
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("Users array is required");
+    }
+
+    const results: BulkRegisterResult[] = [];
+
+    for (let index = 0; index < data.length; index += 1) {
+      const item = data[index];
+
+      try {
+        const result = await this.register(item);
+
+        results.push({
+          index,
+          email: item.email?.trim().toLowerCase() ?? "",
+          success: true,
+          ...result,
+        } as BulkRegisterSuccessResult);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+
+        results.push({
+          index,
+          email: item.email?.trim().toLowerCase() ?? "",
+          success: false,
+          error: message,
+        } as BulkRegisterFailureResult);
+      }
+    }
+
+    return {
+      message: "Bulk register completed",
+      successCount: results.filter((result) => result.success).length,
+      failureCount: results.filter((result) => !result.success).length,
+      results,
+    };
   }
 
   async login(email: string, password: string) {

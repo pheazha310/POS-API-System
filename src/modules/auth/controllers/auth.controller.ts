@@ -6,6 +6,13 @@ import authService from "../services/auth.service";
 class AuthController {
   async register(req: Request, res: Response) {
     try {
+      if (Array.isArray(req.body)) {
+        const result = await authService.registerBulk(req.body);
+        const hasFailures = result.failureCount > 0;
+
+        return res.status(hasFailures ? 207 : 201).json(result);
+      }
+
       const result = await authService.register(req.body);
       return res.status(201).json(result);
     } catch (error: any) {
