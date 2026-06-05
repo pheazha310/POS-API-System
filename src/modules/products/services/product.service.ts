@@ -200,14 +200,14 @@ export class ProductService {
     return updatedProduct;
   }
 
-  async deleteProduct(barcode: string): Promise<Product> {
-    const product = await this.productRepository.findByBarcode(barcode);
+  async deleteProduct(id: string): Promise<Product> {
+    const product = await this.productRepository.findById(id);
 
     if (!product || product.deletedAt) {
       throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND);
     }
 
-    const deletedProduct = await this.productRepository.update(product.id, {
+    const deletedProduct = await this.productRepository.update(id, {
       deletedAt: new Date().toISOString(),
     });
 

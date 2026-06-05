@@ -137,7 +137,7 @@ export class ProductController {
   };
 
   deleteProduct = async (req: Request, res: Response): Promise<void> => {
-    const product = await this.productService.deleteProduct(this.getRouteBarcode(req));
+    const product = await this.productService.deleteProduct(this.getRouteId(req));
 
     res
       .status(HTTP_STATUS.OK)

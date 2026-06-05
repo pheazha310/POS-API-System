@@ -30,7 +30,7 @@ productRouter.get(
 
 productRouter.get("/:id", asyncHandler(productController.getProductById));
 productRouter.put("/:id", asyncHandler(productController.updateProduct));
-productRouter.delete("/:barcode", asyncHandler(productController.deleteProduct));
+productRouter.delete("/:id", asyncHandler(productController.deleteProduct));
 productRouter.post(
   "/:id/stock/increase",
   asyncHandler(productController.increaseStock),
