@@ -105,7 +105,7 @@ export class CartRepository {
 
       const resolvedUserId = await this.resolveUserId(connection, userId);
       const cartRow = await this.findOrCreateCart(resolvedUserId, connection);
-      const [deleteResult] = await connection.query<ResultSetHeader>(
+      let [deleteResult] = await connection.query<ResultSetHeader>(
         `
           UPDATE cart_items
           SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
@@ -113,6 +113,17 @@ export class CartRepository {
         `,
         [itemId, cartRow.id],
       );
+
+      if (deleteResult.affectedRows === 0) {
+        [deleteResult] = await connection.query<ResultSetHeader>(
+          `
+            UPDATE cart_items
+            SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+            WHERE product_id = ? AND cart_id = ? AND deleted_at IS NULL
+          `,
+          [itemId, cartRow.id],
+        );
+      }
 
       if (deleteResult.affectedRows === 0) {
         await connection.rollback();

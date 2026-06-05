@@ -24,7 +24,10 @@ export class CartController {
 
   public async removeItem(req: Request, res: Response): Promise<void> {
     const itemId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const result = await cartService.removeItem(itemId ?? '', this.resolveUserId(req.query.userId));
+    const result = await cartService.removeItem(
+      itemId ?? '',
+      this.resolveUserId(req.query.userId ?? req.body?.userId ?? req.params.userId),
+    );
 
     res
       .status(HTTP_STATUS.OK)
@@ -40,11 +43,13 @@ export class CartController {
   }
 
   private resolveUserId(value: unknown): number | undefined {
-    if (typeof value !== 'string' && typeof value !== 'number') {
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+
+    if (typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
       return undefined;
     }
 
-    const parsed = Number(value);
+    const parsed = Number(resolvedValue);
 
     return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
   }
