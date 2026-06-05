@@ -61,24 +61,34 @@ src/
 │   │   └── app-error.ts
 │   ├── middlewares/
 │   │   ├── error-handler.ts
-│   │   └── not-found.ts
+│   │   ├── not-found.ts
+│   │   ├── validate-request.ts
+│   │   └── ...
 │   └── utils/
 │       ├── api-response.ts
 │       └── async-handler.ts
 ├── modules/
+│   ├── index.ts
 │   ├── auth/
 │   │   ├── controllers/
 │   │   ├── middlewares/
 │   │   ├── models/
 │   │   ├── repositories/
 │   │   ├── routes/
-│   │   └── services/
-│   ├── users/
-│   ├── products/
+│   │   ├── services/
+│   │   └── validators/
 │   ├── cart/
-│   ├── sales/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── repositories/
+│   │   ├── routes/
+│   │   └── services/
+│   ├── checkout/
 │   ├── inventory/
-│   └── reports/
+│   ├── products/
+│   ├── reports/
+│   ├── sales/
+│   └── users/
 ├── app.ts
 └── server.ts
 ```
