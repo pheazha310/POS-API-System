@@ -5,6 +5,10 @@ import type { Sale } from '../../sales/models/sale.model';
 import type { DailyReport, MonthlyReport, ReportSaleSummary, ReportTotals } from '../models/report.model';
 import { reportRepository } from '../repositories/report.repository';
 
+export interface ReportRepositoryPort {
+  findAllSales(): Promise<Sale[]>;
+}
+
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 const toUtcDateKey = (value: string): string => value.slice(0, 10);
@@ -51,9 +55,11 @@ const sortSalesByDate = (sales: Sale[]): Sale[] => {
 };
 
 export class ReportService {
+  constructor(private readonly repository: ReportRepositoryPort = reportRepository) {}
+
   public async getDailyReport(date?: string): Promise<DailyReport> {
     const targetDate = this.resolveDailyDate(date);
-    const sales = sortSalesByDate(await reportRepository.findAllSales()).filter((sale) => toUtcDateKey(sale.soldAt) === targetDate);
+    const sales = sortSalesByDate(await this.repository.findAllSales()).filter((sale) => toUtcDateKey(sale.soldAt) === targetDate);
 
     return {
       date: targetDate,
@@ -65,7 +71,7 @@ export class ReportService {
   public async getMonthlyReport(month?: string, year?: string): Promise<MonthlyReport> {
     const { targetMonth, targetYear } = this.resolveMonthYear(month, year);
     const monthKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
-    const sales = sortSalesByDate(await reportRepository.findAllSales()).filter((sale) => toUtcMonthKey(sale.soldAt) === monthKey);
+    const sales = sortSalesByDate(await this.repository.findAllSales()).filter((sale) => toUtcMonthKey(sale.soldAt) === monthKey);
     const groupedByDay = new Map<string, Sale[]>();
 
     sales.forEach((sale) => {

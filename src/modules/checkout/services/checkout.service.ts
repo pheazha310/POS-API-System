@@ -4,18 +4,23 @@ import { getConnection } from '../../../config/database';
 import { HTTP_STATUS } from '../../../constants/http-status';
 import { MESSAGES } from '../../../constants/messages';
 import { AppError } from '../../../core/errors/app-error';
-import { saleRepository } from '../../sales/repositories/sale.repository';
 import type {
   CheckoutItemInput,
   CheckoutRequest,
   CheckoutResult,
   PaymentMethod,
 } from '../models/checkout.model';
+import type { Sale } from '../../sales/models/sale.model';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { saleRepository } from '../../sales/repositories/sale.repository';
 
 type MySqlIdRow = RowDataPacket & {
   id: number;
 };
+
+export interface CheckoutSaleRepositoryPort {
+  create(payload: Sale): Sale;
+}
 
 const isValidPaymentMethod = (value: unknown): value is PaymentMethod => {
   return value === 'cash' || value === 'card' || value === 'mobile';
@@ -38,6 +43,8 @@ const validateItem = (item: CheckoutItemInput, index: number): void => {
 const toMoney = (value: number): number => Number(value.toFixed(2));
 
 export class CheckoutService {
+  constructor(private readonly salesRepository: CheckoutSaleRepositoryPort = saleRepository) {}
+
   public async createCheckout(payload: Partial<CheckoutRequest> | undefined): Promise<CheckoutResult> {
     const checkoutPayload = payload ?? {};
     const checkoutItems = Array.isArray(checkoutPayload.items) ? checkoutPayload.items : [];
@@ -179,7 +186,7 @@ export class CheckoutService {
   ): Promise<CheckoutResult> {
     const checkoutId = `chk_${randomUUID()}`;
 
-    saleRepository.create({
+    this.salesRepository.create({
       id: `sale_${randomUUID()}`,
       customer: checkoutPayload.customer?.name?.trim()
         ? {

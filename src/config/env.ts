@@ -49,6 +49,7 @@ export const env = {
   dbUser: getRequiredEnv("DB_USER"),
   dbPassword: getOptionalEnv("DB_PASSWORD"),
   databaseUrl: process.env.DATABASE_URL,
-  jwtAccessSecret: getOptionalEnv("JWT_ACCESS_SECRET", "fallback_secret"),
+  jwtAccessSecret: getRequiredEnv("JWT_ACCESS_SECRET"),
   jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? "15m",
+  bcryptSaltRounds: parsePositiveInteger(process.env.BCRYPT_SALT_ROUNDS, 12),
 } as const;

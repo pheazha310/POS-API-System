@@ -1,6 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
-import { IAuthTokenPayload } from "../models/auth.model";
+import { HTTP_STATUS } from "../../../constants/http-status";
+import { AppError } from "../../../core/errors/app-error";
+import { IAuthTokenPayload, UserRole } from "../models/auth.model";
 import authService from "../services/auth.service";
 
 export interface AuthenticatedRequest extends Request {
@@ -9,32 +11,61 @@ export interface AuthenticatedRequest extends Request {
 }
 
 class AuthMiddleware {
-  authenticate(
+  authenticate = (
     req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ) {
+    _res: Response,
+    next: NextFunction,
+  ): void => {
     try {
       const authHeader = req.headers.authorization;
 
       if (!authHeader?.startsWith("Bearer ")) {
-        return res.status(401).json({
-          message: "Authorization token is required",
-        });
+        throw new AppError("Authorization token is required", HTTP_STATUS.UNAUTHORIZED);
       }
 
       const token = authHeader.split(" ")[1];
+
+      if (!token) {
+        throw new AppError("Authorization token is required", HTTP_STATUS.UNAUTHORIZED);
+      }
+
       const user = authService.verifyAccessToken(token);
 
-      req.user  = user;
+      req.user = user;
       req.token = token;
       next();
-    } catch (error: any) {
-      return res.status(401).json({
-        message: error.message || "Invalid token",
-      });
+    } catch (error) {
+      next(error);
     }
-  }
+  };
+
+  authorizeRoles = (...allowedRoles: UserRole[]) => {
+    return (
+      req: AuthenticatedRequest,
+      _res: Response,
+      next: NextFunction,
+    ): void => {
+      try {
+        const currentRole = req.user?.role as UserRole | undefined;
+
+        if (!currentRole) {
+          throw new AppError("Unauthorized", HTTP_STATUS.UNAUTHORIZED);
+        }
+
+        if (!allowedRoles.includes(currentRole)) {
+          throw new AppError("Forbidden", HTTP_STATUS.FORBIDDEN);
+        }
+
+        next();
+      } catch (error) {
+        next(error);
+      }
+    };
+  };
 }
 
-export default new AuthMiddleware();
+export const authMiddleware = new AuthMiddleware();
+export const requireAuth = authMiddleware.authenticate;
+export const requireRoles = (...roles: UserRole[]) => authMiddleware.authorizeRoles(...roles);
+
+export default authMiddleware;

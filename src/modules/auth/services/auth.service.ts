@@ -2,6 +2,9 @@ import bcrypt from "bcrypt";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
 import { env } from "../../../config/env";
+import { HTTP_STATUS } from "../../../constants/http-status";
+import { AppError } from "../../../core/errors/app-error";
+import { VALID_ROLES } from "../../../constants/roles";
 import {
   IAuthTokenPayload,
   IUser,
@@ -11,7 +14,6 @@ import {
 import authRepository from "../repositories/auth.repository";
 
 const tokenBlacklist = new Set<string>();
-const VALID_ROLES: UserRole[] = ["ADMIN", "CASHIER", "MANAGER"];
 
 type BulkRegisterSuccessResult = {
   index: number;
@@ -41,21 +43,35 @@ class AuthService {
   }
 
   private validateRegisterInput(data: Partial<IUser>) {
-    if (!data.name?.trim()) throw new Error("Name is required");
+    if (!data.name?.trim()) {
+      throw new AppError("Name is required", HTTP_STATUS.BAD_REQUEST);
+    }
 
-    if (!data.email?.trim()) throw new Error("Email is required");
+    if (!data.email?.trim()) {
+      throw new AppError("Email is required", HTTP_STATUS.BAD_REQUEST);
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email.trim()))
-      throw new Error("Invalid email format");
+      throw new AppError("Invalid email format", HTTP_STATUS.BAD_REQUEST);
 
-    if (!data.password?.trim()) throw new Error("Password is required");
+    if (!data.password?.trim()) {
+      throw new AppError("Password is required", HTTP_STATUS.BAD_REQUEST);
+    }
 
-    if (data.password.length < 6)
-      throw new Error("Password must be at least 6 characters");
+    if (data.password.length < 8) {
+      throw new AppError(
+        "Password must be at least 8 characters",
+        HTTP_STATUS.BAD_REQUEST,
+      );
+    }
 
-    if (data.role && !VALID_ROLES.includes(data.role as UserRole))
-      throw new Error(`Role must be one of: ${VALID_ROLES.join(", ")}`);
+    if (data.role && !VALID_ROLES.includes(data.role as UserRole)) {
+      throw new AppError(
+        `Role must be one of: ${VALID_ROLES.join(", ")}`,
+        HTTP_STATUS.BAD_REQUEST,
+      );
+    }
   }
 
   async register(data: Partial<IUser>) {
@@ -67,9 +83,11 @@ class AuthService {
     const role: UserRole = (data.role as UserRole) || "CASHIER";
 
     const existingUser = await authRepository.findByEmail(email);
-    if (existingUser) throw new Error("Email already exists");
+    if (existingUser) {
+      throw new AppError("Email already exists", HTTP_STATUS.CONFLICT);
+    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, env.bcryptSaltRounds);
 
     const insertId = await authRepository.createUser({
       name,
@@ -83,7 +101,7 @@ class AuthService {
 
   async registerBulk(data: Array<Partial<IUser>>) {
     if (!Array.isArray(data) || data.length === 0) {
-      throw new Error("Users array is required");
+      throw new AppError("Users array is required", HTTP_STATUS.BAD_REQUEST);
     }
 
     const results: BulkRegisterResult[] = [];
@@ -121,14 +139,23 @@ class AuthService {
   }
 
   async login(email: string, password: string) {
-    if (!email?.trim()) throw new Error("Email is required");
-    if (!password?.trim()) throw new Error("Password is required");
+    if (!email?.trim()) {
+      throw new AppError("Email is required", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    if (!password?.trim()) {
+      throw new AppError("Password is required", HTTP_STATUS.BAD_REQUEST);
+    }
 
     const user = await authRepository.findByEmail(email.trim().toLowerCase());
-    if (!user) throw new Error("Invalid email or password");
+    if (!user) {
+      throw new AppError("Invalid email or password", HTTP_STATUS.UNAUTHORIZED);
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new Error("Invalid email or password");
+    if (!isMatch) {
+      throw new AppError("Invalid email or password", HTTP_STATUS.UNAUTHORIZED);
+    }
 
     const signOptions: SignOptions = {
       expiresIn: env.jwtAccessExpiresIn as SignOptions["expiresIn"],
@@ -153,17 +180,24 @@ class AuthService {
   }
 
   verifyAccessToken(token: string): IAuthTokenPayload {
-    if (tokenBlacklist.has(token))
-      throw new Error("Token has been invalidated");
+    if (tokenBlacklist.has(token)) {
+      throw new AppError("Token has been invalidated", HTTP_STATUS.UNAUTHORIZED);
+    }
 
-    const decoded = jwt.verify(token, env.jwtAccessSecret) as JwtPayload;
+    let decoded: JwtPayload;
+
+    try {
+      decoded = jwt.verify(token, env.jwtAccessSecret) as JwtPayload;
+    } catch (_error) {
+      throw new AppError("Invalid or expired token", HTTP_STATUS.UNAUTHORIZED);
+    }
 
     if (
       typeof decoded !== "object" ||
       typeof decoded.id !== "number" ||
       typeof decoded.role !== "string"
     ) {
-      throw new Error("Invalid token payload");
+      throw new AppError("Invalid token payload", HTTP_STATUS.UNAUTHORIZED);
     }
 
     return {
@@ -176,7 +210,9 @@ class AuthService {
 
   async getCurrentUser(userId: number): Promise<IUserPayload> {
     const user = await authRepository.findUserById(userId);
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      throw new AppError("User not found", HTTP_STATUS.NOT_FOUND);
+    }
     return user;
   }
 }

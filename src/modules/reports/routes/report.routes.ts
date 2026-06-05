@@ -1,16 +1,16 @@
 import { Router } from 'express';
 
 import { asyncHandler } from '../../../core/utils/async-handler';
+import authMiddleware from '../../auth/middlewares/auth.middleware';
 import { reportController } from '../controllers/report.controller';
 
 const reportRouter = Router();
 
-reportRouter.get('/daily', asyncHandler(async (req, res) => {
-  await reportController.getDailyReport(req, res);
-}));
+reportRouter.use(authMiddleware.authenticate);
+reportRouter.use(authMiddleware.authorizeRoles('ADMIN', 'MANAGER'));
 
-reportRouter.get('/monthly', asyncHandler(async (req, res) => {
-  await reportController.getMonthlyReport(req, res);
-}));
+reportRouter.get('/daily', asyncHandler(reportController.getDailyReport));
+
+reportRouter.get('/monthly', asyncHandler(reportController.getMonthlyReport));
 
 export { reportRouter };

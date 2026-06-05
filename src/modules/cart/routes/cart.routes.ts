@@ -2,6 +2,7 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import { asyncHandler } from '../../../core/utils/async-handler';
+import authMiddleware from '../../auth/middlewares/auth.middleware';
 import { cartController } from '../controllers/cart.controller';
 
 const cartRouter = Router();
@@ -12,22 +13,16 @@ const cartRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+cartRouter.use(authMiddleware.authenticate);
+cartRouter.use(authMiddleware.authorizeRoles('ADMIN', 'CASHIER'));
 cartRouter.use(cartRateLimiter);
 
-cartRouter.get('/', asyncHandler(async (_req, res) => {
-  await cartController.getCart(_req, res);
-}));
+cartRouter.get('/', asyncHandler(cartController.getCart));
 
-cartRouter.post('/add', asyncHandler(async (req, res) => {
-  await cartController.addItem(req, res);
-}));
+cartRouter.post('/add', asyncHandler(cartController.addItem));
 
-cartRouter.delete('/item/:id', asyncHandler(async (req, res) => {
-  await cartController.removeItem(req, res);
-}));
+cartRouter.delete('/item/:id', asyncHandler(cartController.removeItem));
 
-cartRouter.post('/clear', asyncHandler(async (_req, res) => {
-  await cartController.clearCart(_req, res);
-}));
+cartRouter.post('/clear', asyncHandler(cartController.clearCart));
 
 export { cartRouter };

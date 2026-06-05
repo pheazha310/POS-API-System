@@ -4,6 +4,13 @@ import { AppError } from '../../../core/errors/app-error';
 import type { Cart, CartItemInput } from '../models/cart.model';
 import { cartRepository } from '../repositories/cart.repository';
 
+export interface CartRepositoryPort {
+  findByUserId(userId?: number): Promise<Cart>;
+  addItems(userId: number | undefined, inputs: CartItemInput[]): Promise<Cart>;
+  removeItem(userId: number | undefined, itemId: number): Promise<Cart | undefined>;
+  clear(userId: number | undefined): Promise<Cart>;
+}
+
 const toMoney = (value: number): number => Number(value.toFixed(2));
 
 const validateCartItem = (payload: Partial<CartItemInput> | undefined): CartItemInput => {
@@ -56,8 +63,10 @@ const normalizeCartItems = (
 };
 
 export class CartService {
+  constructor(private readonly repository: CartRepositoryPort = cartRepository) {}
+
   public async getCart(userId?: number): Promise<Cart> {
-    return cartRepository.findByUserId(userId);
+    return this.repository.findByUserId(userId);
   }
 
   public async addItem(
@@ -75,7 +84,7 @@ export class CartService {
 
     const normalizedItems = items.map(validateCartItem);
 
-    return cartRepository.addItems(userId, normalizedItems);
+    return this.repository.addItems(userId, normalizedItems);
   }
 
   public async removeItem(id: string, userId?: number): Promise<Cart> {
@@ -91,7 +100,7 @@ export class CartService {
       throw new AppError(MESSAGES.CART_ITEM_ID_REQUIRED, HTTP_STATUS.BAD_REQUEST);
     }
 
-    const removedItem = await cartRepository.removeItem(userId, itemId);
+    const removedItem = await this.repository.removeItem(userId, itemId);
 
     if (!removedItem) {
       throw new AppError(MESSAGES.CART_ITEM_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
@@ -101,7 +110,7 @@ export class CartService {
   }
 
   public async clearCart(userId?: number): Promise<Cart> {
-    return cartRepository.clear(userId);
+    return this.repository.clear(userId);
   }
 }
 

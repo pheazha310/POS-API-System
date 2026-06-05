@@ -1,16 +1,16 @@
 import { Router } from 'express';
 
 import { asyncHandler } from '../../../core/utils/async-handler';
+import authMiddleware from '../../auth/middlewares/auth.middleware';
 import { saleController } from '../controllers/sale.controller';
 
 const saleRouter = Router();
 
-saleRouter.get('/', asyncHandler(async (_req, res) => {
-  await saleController.getSales(_req, res);
-}));
+saleRouter.use(authMiddleware.authenticate);
+saleRouter.use(authMiddleware.authorizeRoles('ADMIN', 'MANAGER'));
 
-saleRouter.get('/:id', asyncHandler(async (req, res) => {
-  await saleController.getSaleById(req, res);
-}));
+saleRouter.get('/', asyncHandler(saleController.getSales));
+
+saleRouter.get('/:id', asyncHandler(saleController.getSaleById));
 
 export { saleRouter };
